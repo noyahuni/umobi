@@ -1,0 +1,47 @@
+#worker.list=loadbalancer,jkstatus
+worker.list=loadbalancer
+
+# worker was1
+#worker.was1.host=210.120.247.100
+#worker.was1.port=8009
+#worker.was1.type=ajp13
+#worker.was1.ping_mode=A
+#worker.was1.lbfactor=1
+
+# worker was2
+#worker.was2.host=210.120.247.100
+#worker.was2.port=8109
+#worker.was2.type=ajp13
+#worker.was2.ping_mode=A
+#worker.was2.lbfactor=1
+
+# worker was3
+worker.was3.host=127.0.0.1
+worker.was3.port=8009
+worker.was3.type=ajp13
+worker.was3.ping_mode=A
+worker.was3.lbfactor=1
+worker.was1.cachesize=10
+worker.was1.cache_timeout=600
+worker.was1.socket_keepalive=1
+worker.was1.socket_timeout=300
+
+# worker was4
+worker.was4.host=127.0.0.1
+worker.was4.port=8109
+worker.was4.type=ajp13
+worker.was4.ping_mode=A
+worker.was4.lbfactor=1
+worker.was1.cachesize=10
+worker.was1.cache_timeout=600
+worker.was1.socket_keepalive=1
+worker.was1.socket_timeout=300
+
+# worker loadbalancer 
+worker.loadbalancer.type=lb
+worker.loadbalancer.sticky_session=1
+worker.loadbalancer.balance_workers=was3
+#worker.loadbalancer.balance_workers=was3,was4
+
+# jkstatus worker
+#worker.jkstatus.type=status

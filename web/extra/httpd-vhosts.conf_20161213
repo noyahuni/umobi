@@ -1,0 +1,123 @@
+#
+# Virtual Hosts
+#
+# If you want to maintain multiple domains/hostnames on your
+# machine you can setup VirtualHost containers for them. Most configurations
+# use only name-based virtual hosts so the server doesn't need to worry about
+# IP addresses. This is indicated by the asterisks in the directives below.
+#
+# Please see the documentation at 
+# <URL:http://httpd.apache.org/docs/2.2/vhosts/>
+# for further details before you try to setup virtual hosts.
+#
+# You may use the command line option '-S' to verify your virtual host
+# configuration.
+
+#
+# Use name-based virtual hosting.
+#
+NameVirtualHost *:80
+
+#
+# VirtualHost example:
+# Almost any Apache directive may go into a VirtualHost container.
+# The first VirtualHost section is used for all requests that do not
+# match a ServerName or ServerAlias in any <VirtualHost> block.
+#
+#
+SetEnvIf Request_URI \.GIF$ image=GIF
+SetEnvIf Request_URI \.png$ image=png
+SetEnvIf Request_URI \.gif$ image=gif
+SetEnvIf Request_URI \.JPG$ image=JPG
+SetEnvIf Request_URI \.jpg$ image=jpg
+SetEnvIf Request_URI \.css$ image=css
+SetEnvIf Request_URI \.js$ image=js
+SetEnvIf Request_URI favicon\.ico$ image=ico
+SetEnvIf Request_URI "^/.*default\.ida.*" image=CodeRed
+SetEnvIf Request_URI "(cmd.exe|root\.exe)" image=CodeRed
+SetEnvIf User-Agent "HTTP-Monitor/1.1" image=CodeRed
+
+<VirtualHost *:80>
+    ServerName umobi.co.kr
+    DocumentRoot /svc/addon/mvno/wwwhome
+    RewriteEngine On
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^/(.*) https://www.umobi.co.kr/$1
+</VirtualHost>
+
+<VirtualHost *:80>
+    DocumentRoot /svc/addon/mvno/wwwhome
+    ServerName www.umobi.co.kr
+    ServerAlias family.umobi.co.kr shop.umobi.co.kr m.umobi.co.kr umobi.co.kr
+    JkMountFile conf/uriworkermap.properties
+    ErrorLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_error.%Y%m%d 86400"
+    CustomLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_access.%Y%m%d 86400" combined env=!image
+
+    RewriteEngine On
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteCond %{REQUEST_URI} !^/services
+    RewriteRule ^/(.*) https://%{SERVER_NAME}/$1
+
+    #RewriteCond %{REMOTE_ADDR} !^112\.217\.58\.74
+    #RewriteRule ^/services/(.*) https://%{SERVER_NAME}
+
+
+  <Directory "/svc/addon/mvno/wwwhome>
+   AllowOverride None
+   Options None
+    <Limit OPTIONS PROPFIND>
+        Order allow,deny
+        Allow from all
+    </Limit>
+    <LimitExcept GET POST>
+        Order deny,allow
+        Deny from all
+    </LimitExcept>
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    DocumentRoot /svc/addon/mvno/imghome
+    ServerName img.umobi.co.kr
+    ErrorLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_img_error.%Y%m%d 86400"
+    CustomLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_img_access.%Y%m%d 86400" combined env=!image
+
+
+  <Directory "/svc/addon/mvno/imghome>
+   AllowOverride None
+   Options None
+    <Limit OPTIONS PROPFIND>
+        Order allow,deny
+        Allow from all
+    </Limit>
+    <LimitExcept GET POST>
+        Order deny,allow
+        Deny from all
+    </LimitExcept>
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    DocumentRoot /svc/addon/mvno/mhome
+    ServerName m.umobi.co.kr
+    ErrorLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_mobile_error.%Y%m%d 86400"
+    CustomLog "| /usr/local/apache2/bin/rotatelogs /svc/logs/web/mvno_mobile_access.%Y%m%d 86400" combined env=!image
+
+    RewriteEngine On
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^/(.*) https://%{SERVER_NAME}/$1
+
+
+  <Directory "/svc/addon/mvno/mhome>
+   AllowOverride None
+   Options None
+    <Limit OPTIONS PROPFIND>
+        Order allow,deny
+        Allow from all
+    </Limit>
+    <LimitExcept GET POST>
+        Order deny,allow
+        Deny from all
+    </LimitExcept>
+  </Directory>
+</VirtualHost>
